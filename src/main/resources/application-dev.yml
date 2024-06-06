@@ -1,0 +1,36 @@
+server:
+  port: 8086
+  application:
+    name: ffmpeg-yr
+servlet:
+  multipart:
+    enabled: true
+app:
+  video-folder: \home\ffmpegVedio\
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: -1
+      max-request-size: -1
+      location: "${java.io.tmpdir}"
+      resolve-lazily: false
+      file-size-threshold: 1MB
+  web:
+    resources:
+      static-locations:
+        - "classpath:/static/"
+        - "file:${app.video-folder}"
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+upload:
+  url: http://localhost:8060/camera_vision_api/camera_vision_v2/predict
