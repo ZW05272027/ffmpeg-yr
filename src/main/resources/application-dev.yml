@@ -33,4 +33,4 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 upload:
-  url: http://localhost:8060/camera_vision_api/camera_vision_v2/predict
+  url: http://localhost:8060/camera_vision_v2/predict
