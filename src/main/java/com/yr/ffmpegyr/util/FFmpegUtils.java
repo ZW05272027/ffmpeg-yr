@@ -118,11 +118,12 @@ public class FFmpegUtils {
         List<String> commands = new ArrayList<>();
         commands.add("ffmpeg");
         commands.add("-i")		;commands.add(source);					                                        // 源文件
-        commands.add("-vf")		;commands.add("\"select=not(mod(n\\,100)),scale=720:-1,setpts=0.5*PTS,fps=5\"");// 视频压缩
+        commands.add("-vf")		;commands.add("scale=720:-1,fps=5");// 视频压缩
         commands.add("-vsync")	;commands.add("vfr");					                                        // 设置视频同步模式为可变帧率
 
-        commands.add(workDir.toString()+"\\output_%04d.png");											// 生成png
+        commands.add(workDir.toString()+"/output_%04d.png");											// 生成png
 //        ffmpeg -i C:\Users\PC\Desktop\视频\1676019073009.mp4 -vf "select=not(mod(n\,100)),scale=720:-1,fps=5" -vsync vfr C:\Users\PC\Desktop\视频\img\output_%04d.png
+        log.info("执行命令：" + String.join(" ", commands));
         // 构建进程
         Process process = new ProcessBuilder()
                 .command(commands)

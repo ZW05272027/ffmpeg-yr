@@ -6,7 +6,7 @@ servlet:
   multipart:
     enabled: true
 app:
-  video-folder: \home\ffmpegVedio\
+  video-folder: /home/ffmpegVedio
 management:
   endpoints:
     web:

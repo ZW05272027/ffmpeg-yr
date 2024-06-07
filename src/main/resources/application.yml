@@ -2,11 +2,13 @@ server:
   port: 8086
   application:
     name: ffmpeg-yr
+  servlet:
+    context-path: /info
 servlet:
   multipart:
     enabled: true
 app:
-  video-folder: \home\ffmpegVedio\
+  video-folder: /home/ffmpegVedio
 management:
   endpoints:
     web:
