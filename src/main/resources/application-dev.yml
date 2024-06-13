@@ -34,3 +34,4 @@ springdoc:
     path: /swagger-ui.html
 upload:
   url: http://localhost:8060/camera_vision_v2/predict
+  delete: 0

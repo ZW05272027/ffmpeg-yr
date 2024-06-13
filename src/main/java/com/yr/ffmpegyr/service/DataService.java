@@ -4,6 +4,7 @@ import cn.hutool.cache.CacheUtil;
 import cn.hutool.cache.impl.FIFOCache;
 import cn.hutool.cache.impl.TimedCache;
 import cn.hutool.core.lang.generator.UUIDGenerator;
+import com.alibaba.fastjson2.JSONObject;
 import com.yr.ffmpegyr.config.LimitHandler;
 import com.yr.ffmpegyr.controller.vo.AiResult;
 import com.yr.ffmpegyr.controller.vo.ChartVO;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executor;
@@ -52,6 +54,8 @@ public class DataService {
     private Integer uploadBatch;
     @Value("${upload.url:https://detect.91jzx.cn/camera_vision_api/camera_vision_v2/predict}")
     private String uploadUrl;
+    @Value("${upload.delete:0}")
+    private Integer deleteFile;
     @Autowired
     private LimitHandler limitHandler;
     public DataService(@Value("${cache.max:50}")int cacheMax) {
@@ -84,7 +88,8 @@ public class DataService {
                     if (directory.isDirectory()) {
                         // 获取文件夹下的所有文件和文件夹的名称
                         List<String> filesList = Stream.of(Objects.requireNonNull(directory.list()))
-                                .filter(fileName -> fileName.endsWith(".png")).collect(Collectors.toList());
+                                .filter(fileName -> fileName.endsWith(".png"))
+                                .sorted(Comparator.comparingInt(o -> Integer.parseInt(o.split("_")[1].replace(".png", "")))).collect(Collectors.toList());
 
                         int size = uploadBatch * uploadCount;
                         int schedule =filesList.size()/size+(filesList.size()%size==0?0:1);
@@ -92,6 +97,10 @@ public class DataService {
                         for(int i = 0; i < schedule; i++){
 
                             List<String> uploadList = filesList.subList(i * size, i != schedule - 1 ? (i + 1) * size : filesList.size());
+                            if(uploadList.isEmpty()){
+                                continue;
+                            }
+                            log.info(JSONObject.toJSONString(uploadList));
                             List<AiResult> analyses = UploadUtil.analyse(uploadUrl,dir, uploadList, AiResult.class);
                             assert analyses != null;
                             setSchedule(taskId,i,schedule,merge(analyses));
@@ -109,8 +118,9 @@ public class DataService {
                     keyCache.put(TASK_CACHE_KEY+taskId,100);
                     if(StringUtils.isNotEmpty(dir)) {
                         File directory = new File(destFolder);
-                        if (directory.exists()) {
+                        if (deleteFile==0&&directory.exists()) {
                             deleteDirectory(directory);
+                            log.info("删除成功");
                         }
                     }
                     limitHandler.decrement();
